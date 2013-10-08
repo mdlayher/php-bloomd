@@ -8,6 +8,14 @@ class BloomdClient
 	const BLOOMD_TCP = 0;
 	const BLOOMD_UDP = 1;
 
+	// Constants for string responses from bloomd
+	const BLOOMD_DONE = "Done";
+	const BLOOMD_EXISTS = "Exists";
+	const BLOOMD_LIST_START = "START";
+	const BLOOMD_LIST_END = "END";
+	const BLOOMD_YES = "Yes";
+	const BLOOMD_NO = "No";
+
 	// INSTANCE VARIABLES - - - - - - - - - - - - - - - - -
 
 	// Server host, port, protocol
@@ -82,6 +90,44 @@ class BloomdClient
 		return false;
 	}
 
+	// Create a bloom filter on server
+	public function createFilter($name, $capacity = null, $falsePositiveRate = null, $inMemory = null)
+	{
+		// Begin building command to send to server
+		$buffer = "create " . $name . " ";
+
+		// If specified, send capacity
+		if (isset($capacity) && is_int($capacity))
+		{
+			$buffer .= "capacity=" . $capacity . " ";
+		}
+
+		// If specified, send false positive rate
+		if (isset($falsePositiveRate) && is_float($falsePositiveRate))
+		{
+			$buffer .= "prob=" . $falsePositiveRate . " ";
+		}
+
+		// If specified, choose if filter should reside in memory
+		if (isset($inMemory) && is_bool($inMemory))
+		{
+			// Bool to integer
+			$inMemory = $inMemory ? 1 : 0;
+
+			$buffer .= "in_memory=" . $inMemory;
+		}
+
+		$buffer .= "\n";
+
+		// Send create filter request to server, verify done
+		if ($this->send($buffer) === self::BLOOMD_DONE)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	// Send a message to server on socket
 	private function send($input)
 	{
@@ -90,9 +136,12 @@ class BloomdClient
 			throw new Exception(__METHOD__ . ": client is not connected to bloomd server!");
 		}
 
-		// Write message on socket
+		// Write message on socket, read reply
+		printf("send: " . $input);
 		socket_write($this->socket, $input);
+		$response = trim(socket_read($this->socket, 8192), "\r\n");
 
-		return true;
+		printf("recv: '" . $response . "'");
+		return $response;
 	}
 }
