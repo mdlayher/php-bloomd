@@ -21,7 +21,7 @@ class BloomdClient
 	// Connection status
 	protected $connected = false;
 
-	// CONSTRUCTOR - - - - - - - - - - - - - - - - - - - -
+	// CONSTRUCTOR/DESTRUCTOR - - - - - - - - - - - - - - -
 
 	public function __construct($host, $port = 8673, $protocol = self::BLOOMD_TCP)
 	{
@@ -34,6 +34,17 @@ class BloomdClient
 		{
 			$this->connect();
 		}
+	}
+
+	public function __destruct()
+	{
+		// Ensure open connections closed
+		if ($this->connected || isset($this->socket))
+		{
+			$this->disconnect();
+		}
+
+		return true;
 	}
 
 	// Initiate a connection to bloomd server
