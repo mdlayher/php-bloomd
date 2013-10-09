@@ -251,7 +251,7 @@ class BloomdClient
 	private function sendMulti($command, $filter, array $items)
 	{
 		// Build command, add all items
-		$buffer = "multi " . $filter . " ";
+		$buffer = sprintf("%s %s ", $command, $filter);
 		foreach ($items as $i)
 		{
 			$buffer .= $i . " ";
