@@ -4,10 +4,6 @@ class BloomdClient
 {
 	// CONSTANTS - - - - - - - - - - - - - - - - - - - - -
 
-	// Constants for TCP or UDP connection to bloomd
-	const BLOOMD_TCP = 0;
-	const BLOOMD_UDP = 1;
-
 	// Constants for string responses from bloomd
 	const BLOOMD_DONE = "Done";
 	const BLOOMD_EXISTS = "Exists";
@@ -18,10 +14,9 @@ class BloomdClient
 
 	// INSTANCE VARIABLES - - - - - - - - - - - - - - - - -
 
-	// Server host, port, protocol
+	// Server host, port
 	protected $host;
 	protected $port;
-	protected $protocol;
 
 	// The socket used for communication with bloomd
 	protected $socket;
@@ -31,17 +26,10 @@ class BloomdClient
 
 	// CONSTRUCTOR/DESTRUCTOR - - - - - - - - - - - - - - -
 
-	public function __construct($host, $port = 8673, $protocol = self::BLOOMD_TCP)
+	public function __construct($host, $port = 8673)
 	{
 		$this->host = $host;
 		$this->port = $port;
-		$this->protocol = $protocol;
-
-		// If protocol is TCP, open persistent connection to server
-		if ($protocol === self::BLOOMD_TCP)
-		{
-			$this->connect();
-		}
 	}
 
 	public function __destruct()
@@ -65,7 +53,10 @@ class BloomdClient
 			socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, array('sec' => 1, 'usec' => 0));
 
 			// Connect to host
-			socket_connect($this->socket, $this->host, intval($this->port));
+			if (!@socket_connect($this->socket, $this->host, intval($this->port)))
+			{
+				return false;
+			}
 
 			$this->connected = true;
 			return true;
@@ -138,6 +129,12 @@ class BloomdClient
 
 		// Set items, record status
 		$response = explode(" ", $this->send($buffer));
+
+		// Verify response received
+		if (empty($response[0]))
+		{
+			return null;
+		}
 
 		// Create associative array of keys and booleans of whether or not they were successfully set
 		$status = array();
@@ -279,8 +276,14 @@ class BloomdClient
 
 		// Write message on socket, read reply
 		printf("send: " . $input . "\n");
-		socket_write($this->socket, $input . "\n");
-		$response = trim(socket_read($this->socket, 8192), "\r\n");
+		@socket_write($this->socket, $input . "\n");
+		$response = trim(@socket_read($this->socket, 8192), "\r\n");
+
+		// Throw exception if no response
+		if (empty($response))
+		{
+			throw new Exception(__METHOD__ . ": received empty response from bloomd server!");
+		}
 
 		printf("recv: '" . $response . "'\n");
 		return $response;
