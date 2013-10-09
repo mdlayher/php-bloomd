@@ -138,6 +138,17 @@ class BloomdClient
 		return false;
 	}
 
+	// Flush data from a specified filter
+	public function flushFilter($name)
+	{
+		if ($this->send("flush " . $name) === self::BLOOMD_DONE)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	// Retrieve a list of filters and their status by matching name, or all filters if none provided
 	public function listFilters($name = null)
 	{
@@ -158,7 +169,7 @@ class BloomdClient
 			}
 
 			// Convert status into associative arrays
-			$fields = array("name", "falsePositiveRate", "size", "capacity", "itemCount");
+			$fields = array("name", "probability", "size", "capacity", "items");
 			$list[] = array_combine($fields, explode(" ", $line));
 		}
 
