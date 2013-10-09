@@ -215,15 +215,16 @@ class BloomdClient
 	}
 
 	// Check if value is in filter
+	// NOTE: value is hashed in order to make long keys a uniform length
 	public function check($filter, $value)
 	{
-		return $this->send(sprintf("check %s %s", $filter, $value)) === self::BLOOMD_YES;
+		return $this->send(sprintf("check %s %s", $filter, sha1($value))) === self::BLOOMD_YES;
 	}
 
 	// Set a value in a specified filter
 	public function set($filter, $value)
 	{
-		return $this->send(sprintf("set %s %s", $filter, $value)) === self::BLOOMD_YES;
+		return $this->send(sprintf("set %s %s", $filter, sha1($value))) === self::BLOOMD_YES;
 	}
 
 	// Send a message to server on socket
@@ -254,7 +255,7 @@ class BloomdClient
 		$buffer = sprintf("%s %s ", $command, $filter);
 		foreach ($items as $i)
 		{
-			$buffer .= $i . " ";
+			$buffer .= sha1($i) . " ";
 		}
 
 		// Set items, record status
