@@ -117,10 +117,19 @@ class BloomdClient
 			$buffer .= "in_memory=" . $inMemory;
 		}
 
-		$buffer .= "\n";
-
 		// Send create filter request to server, verify done
 		if ($this->send($buffer) === self::BLOOMD_DONE)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	// Drop a bloom filter on server
+	public function dropFilter($name)
+	{
+		if ($this->send("drop " . $name) === self::BLOOMD_DONE)
 		{
 			return true;
 		}
@@ -137,11 +146,11 @@ class BloomdClient
 		}
 
 		// Write message on socket, read reply
-		printf("send: " . $input);
-		socket_write($this->socket, $input);
+		printf("send: " . $input . "\n");
+		socket_write($this->socket, $input . "\n");
 		$response = trim(socket_read($this->socket, 8192), "\r\n");
 
-		printf("recv: '" . $response . "'");
+		printf("recv: '" . $response . "'\n");
 		return $response;
 	}
 }
