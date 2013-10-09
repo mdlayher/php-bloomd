@@ -176,6 +176,33 @@ class BloomdClient
 		return $list;
 	}
 
+	// Retrieve detailed information about filter with specified name
+	public function info($name)
+	{
+		// Send info request
+		$response = $this->send("info " . $info);
+
+		// Status associative array
+		$status = array();
+
+		// Parse through multi line response
+		foreach (explode("\n", $response) as $line)
+		{
+			// Strip newlines, ignore start and end messages
+			$line = trim($line, "\r\n");
+			if ($line === self::BLOOMD_LIST_START || $line === self::BLOOMD_LIST_END)
+			{
+				continue;
+			}
+
+			// Split into keys and values
+			$pair = explode(" ", $line);
+			$status[$pair[0]] = $pair[1];
+		}
+
+		return $status;
+	}
+
 	// Check if value is in filter
 	public function check($filter, $value)
 	{
