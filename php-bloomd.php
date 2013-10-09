@@ -126,6 +126,52 @@ class BloomdClient
 		return false;
 	}
 
+	// Set multiple items in filter on server
+	public function bulk($filter, array $items)
+	{
+		// Build command, add all items
+		$buffer = "bulk " . $filter . " ";
+		foreach ($items as $i)
+		{
+			$buffer .= $i . " ";
+		}
+
+		// Set items, record status
+		$response = explode(" ", $this->send($buffer));
+
+		// Create associative array of keys and booleans of whether or not they were successfully set
+		$status = array();
+		for ($i = 0; $i < count($items); $i++)
+		{
+			$status[$items[$i]] = $response[$i] === self::BLOOMD_YES;
+		}
+
+		return $status;
+	}
+
+	// Check for multiple items in filter on server
+	public function multi($filter, array $items)
+	{
+		// Build command, add all items
+		$buffer = "multi " . $filter . " ";
+		foreach ($items as $i)
+		{
+			$buffer .= $i . " ";
+		}
+
+		// Set items, record status
+		$response = explode(" ", $this->send($buffer));
+
+		// Create associative array of keys and booleans of whether or not they were successfully set
+		$status = array();
+		for ($i = 0; $i < count($items); $i++)
+		{
+			$status[$items[$i]] = $response[$i] === self::BLOOMD_YES;
+		}
+
+		return $status;
+	}
+
 	// Close an in-memory filter on server
 	public function closeFilter($name)
 	{
