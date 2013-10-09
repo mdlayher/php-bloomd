@@ -137,6 +137,32 @@ class BloomdClient
 		return false;
 	}
 
+	// Retrieve a list of filters and their status by matching name, or all filters if none provided
+	public function listFilters($name = null)
+	{
+		$response = $this->send("list " . $name);
+
+		// List of statuses to send back
+		$list = array();
+
+		// Parse through multi line response
+		foreach (explode("\n", $response) as $line)
+		{
+			// Strip newlines, ignore start and end messages
+			$line = trim($line, "\r\n");
+			if ($line === self::BLOOMD_LIST_START || $line === self::BLOOMD_LIST_END)
+			{
+				continue;
+			}
+
+			// Convert status into associative arrays
+			$fields = array("name", "falsePositiveRate", "size", "capacity", "itemCount");
+			$list[] = array_combine($fields, explode(" ", $line));
+		}
+
+		return $list;
+	}
+
 	// Send a message to server on socket
 	private function send($input)
 	{
