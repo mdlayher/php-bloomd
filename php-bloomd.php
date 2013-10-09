@@ -129,6 +129,7 @@ class BloomdClient
 	// Drop a bloom filter on server
 	public function dropFilter($name)
 	{
+		// Send drop request
 		if ($this->send("drop " . $name) === self::BLOOMD_DONE)
 		{
 			return true;
@@ -140,6 +141,7 @@ class BloomdClient
 	// Retrieve a list of filters and their status by matching name, or all filters if none provided
 	public function listFilters($name = null)
 	{
+		// Send list request
 		$response = $this->send("list " . $name);
 
 		// List of statuses to send back
@@ -161,6 +163,30 @@ class BloomdClient
 		}
 
 		return $list;
+	}
+
+	// Check if value is in filter
+	public function check($filter, $value)
+	{
+		// Check for value
+		if ($this->send(sprintf("check %s %s", $filter, $value)) === self::BLOOMD_YES)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	// Set a value in a specified filter
+	public function set($filter, $value)
+	{
+		// Set value in filter
+		if ($this->send(sprintf("set %s %s", $filter, $value)) === self::BLOOMD_YES)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	// Send a message to server on socket
