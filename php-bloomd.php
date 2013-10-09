@@ -91,7 +91,7 @@ class BloomdClient
 	}
 
 	// Create a bloom filter on server
-	public function createFilter($name, $capacity = null, $falsePositiveRate = null, $inMemory = null)
+	public function createFilter($name, $capacity = null, $probability = null, $inMemory = null)
 	{
 		// Begin building command to send to server
 		$buffer = "create " . $name . " ";
@@ -103,9 +103,9 @@ class BloomdClient
 		}
 
 		// If specified, send false positive rate
-		if (isset($falsePositiveRate) && is_float($falsePositiveRate))
+		if (isset($probability) && is_float($probability))
 		{
-			$buffer .= "prob=" . $falsePositiveRate . " ";
+			$buffer .= "prob=" . $probability . " ";
 		}
 
 		// If specified, choose if filter should reside in memory
@@ -126,27 +126,29 @@ class BloomdClient
 		return false;
 	}
 
+	// Close an in-memory filter on server
+	public function closeFilter($name)
+	{
+		return $this->send("close " . $name) === self::BLOOMD_DONE;
+	}
+
+	// Clear an in-memory filter on server
+	// NOTE: Should only be called after filter is closed
+	public function clearFilter($name)
+	{
+		return $this->send("clear " . $name) === self::BLOOMD_DONE;
+	}
+
 	// Drop a bloom filter on server
 	public function dropFilter($name)
 	{
-		// Send drop request
-		if ($this->send("drop " . $name) === self::BLOOMD_DONE)
-		{
-			return true;
-		}
-
-		return false;
+		return $this->send("drop " . $name) === self::BLOOMD_DONE;
 	}
 
 	// Flush data from a specified filter
 	public function flushFilter($name)
 	{
-		if ($this->send("flush " . $name) === self::BLOOMD_DONE)
-		{
-			return true;
-		}
-
-		return false;
+		return $this->send("flush " . $name) === self::BLOOMD_DONE;
 	}
 
 	// Retrieve a list of filters and their status by matching name, or all filters if none provided
@@ -212,25 +214,13 @@ class BloomdClient
 	// Check if value is in filter
 	public function check($filter, $value)
 	{
-		// Check for value
-		if ($this->send(sprintf("check %s %s", $filter, $value)) === self::BLOOMD_YES)
-		{
-			return true;
-		}
-
-		return false;
+		return $this->send(sprintf("check %s %s", $filter, $value)) === self::BLOOMD_YES;
 	}
 
 	// Set a value in a specified filter
 	public function set($filter, $value)
 	{
-		// Set value in filter
-		if ($this->send(sprintf("set %s %s", $filter, $value)) === self::BLOOMD_YES)
-		{
-			return true;
-		}
-
-		return false;
+		return $this->send(sprintf("set %s %s", $filter, $value)) === self::BLOOMD_YES;
 	}
 
 	// Send a message to server on socket
