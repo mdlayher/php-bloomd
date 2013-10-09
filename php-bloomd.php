@@ -43,6 +43,8 @@ class BloomdClient
 		return true;
 	}
 
+	// PUBLIC METHODS - - - - - - - - - - - - - - - - - - - -
+
 	// Initiate a connection to bloomd server
 	public function connect()
 	{
@@ -115,18 +117,6 @@ class BloomdClient
 		}
 
 		return false;
-	}
-
-	// Set multiple items in filter on server
-	public function bulk($filter, array $items)
-	{
-		return $this->sendMulti("bulk", $filter, $items);
-	}
-
-	// Check for multiple items in filter on server
-	public function multi($filter, array $items)
-	{
-		return $this->sendMulti("multi", $filter, $items);
 	}
 
 	// Close an in-memory filter on server
@@ -226,6 +216,20 @@ class BloomdClient
 	{
 		return $this->send(sprintf("set %s %s", $filter, sha1($value))) === self::BLOOMD_YES;
 	}
+
+	// Set multiple items in filter on server
+	public function bulk($filter, array $items)
+	{
+		return $this->sendMulti("bulk", $filter, $items);
+	}
+
+	// Check for multiple items in filter on server
+	public function multi($filter, array $items)
+	{
+		return $this->sendMulti("multi", $filter, $items);
+	}
+
+	// PRIVATE METHODS - - - - - - - - - - - - - - - - - - - -
 
 	// Send a message to server on socket
 	private function send($input)
