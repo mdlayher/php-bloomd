@@ -120,53 +120,13 @@ class BloomdClient
 	// Set multiple items in filter on server
 	public function bulk($filter, array $items)
 	{
-		// Build command, add all items
-		$buffer = "bulk " . $filter . " ";
-		foreach ($items as $i)
-		{
-			$buffer .= $i . " ";
-		}
-
-		// Set items, record status
-		$response = explode(" ", $this->send($buffer));
-
-		// Verify response received
-		if (empty($response[0]))
-		{
-			return null;
-		}
-
-		// Create associative array of keys and booleans of whether or not they were successfully set
-		$status = array();
-		for ($i = 0; $i < count($items); $i++)
-		{
-			$status[$items[$i]] = $response[$i] === self::BLOOMD_YES;
-		}
-
-		return $status;
+		return $this->sendMulti("bulk", $filter, $items);
 	}
 
 	// Check for multiple items in filter on server
 	public function multi($filter, array $items)
 	{
-		// Build command, add all items
-		$buffer = "multi " . $filter . " ";
-		foreach ($items as $i)
-		{
-			$buffer .= $i . " ";
-		}
-
-		// Set items, record status
-		$response = explode(" ", $this->send($buffer));
-
-		// Create associative array of keys and booleans of whether or not they were successfully set
-		$status = array();
-		for ($i = 0; $i < count($items); $i++)
-		{
-			$status[$items[$i]] = $response[$i] === self::BLOOMD_YES;
-		}
-
-		return $status;
+		return $this->sendMulti("multi", $filter, $items);
 	}
 
 	// Close an in-memory filter on server
@@ -275,7 +235,6 @@ class BloomdClient
 		}
 
 		// Write message on socket, read reply
-		printf("send: " . $input . "\n");
 		@socket_write($this->socket, $input . "\n");
 		$response = trim(@socket_read($this->socket, 8192), "\r\n");
 
@@ -285,7 +244,29 @@ class BloomdClient
 			throw new Exception(__METHOD__ . ": received empty response from bloomd server!");
 		}
 
-		printf("recv: '" . $response . "'\n");
 		return $response;
+	}
+
+	// Do a multiple set/get operation
+	private function sendMulti($command, $filter, array $items)
+	{
+		// Build command, add all items
+		$buffer = "multi " . $filter . " ";
+		foreach ($items as $i)
+		{
+			$buffer .= $i . " ";
+		}
+
+		// Set items, record status
+		$response = explode(" ", $this->send($buffer));
+
+		// Create associative array of keys and booleans of whether or not they were successfully set
+		$status = array();
+		for ($i = 0; $i < count($items); $i++)
+		{
+			$status[$items[$i]] = $response[$i] === self::BLOOMD_YES;
+		}
+
+		return $status;
 	}
 }
