@@ -180,7 +180,7 @@ class BloomdClient
 	public function info($name)
 	{
 		// Send info request
-		$response = $this->send("info " . $info);
+		$response = $this->send("info " . $name);
 
 		// Status associative array
 		$status = array();
@@ -188,6 +188,12 @@ class BloomdClient
 		// Parse through multi line response
 		foreach (explode("\n", $response) as $line)
 		{
+			// Check for bad response
+			if ($line == "Filter does not exist")
+			{
+				break;
+			}
+
 			// Strip newlines, ignore start and end messages
 			$line = trim($line, "\r\n");
 			if ($line === self::BLOOMD_LIST_START || $line === self::BLOOMD_LIST_END)
