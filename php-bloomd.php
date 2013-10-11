@@ -6,11 +6,9 @@ class BloomdClient
 
 	// Constants for string responses from bloomd
 	const BLOOMD_DONE = "Done";
-	const BLOOMD_EXISTS = "Exists";
 	const BLOOMD_LIST_START = "START";
 	const BLOOMD_LIST_END = "END";
 	const BLOOMD_YES = "Yes";
-	const BLOOMD_NO = "No";
 
 	// INSTANCE VARIABLES - - - - - - - - - - - - - - - - -
 
@@ -48,23 +46,23 @@ class BloomdClient
 	// Initiate a connection to bloomd server
 	public function connect()
 	{
-		if (!$this->connected)
+		if ($this->connected)
 		{
-			// Create a IPv4 TCP socket
-			$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-			socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, array('sec' => 1, 'usec' => 0));
-
-			// Connect to host
-			if (!@socket_connect($this->socket, $this->host, intval($this->port)))
-			{
-				return false;
-			}
-
-			$this->connected = true;
-			return true;
+			return false;
 		}
 
-		return false;
+		// Create a IPv4 TCP socket
+		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+		socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, array('sec' => 1, 'usec' => 0));
+
+		// Connect to host
+		if (!@socket_connect($this->socket, $this->host, intval($this->port)))
+		{
+			return false;
+		}
+
+		$this->connected = true;
+		return true;
 	}
 
 	// Close a connection to bloomd server
