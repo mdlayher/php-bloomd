@@ -104,9 +104,7 @@ class BloomdClient
 		if (isset($inMemory) && is_bool($inMemory))
 		{
 			// Bool to integer
-			$inMemory = $inMemory ? 1 : 0;
-
-			$buffer .= "in_memory=" . $inMemory;
+			$buffer .= "in_memory=" . $inMemory ? 1 : 0;
 		}
 
 		// Send create filter request to server, verify done
