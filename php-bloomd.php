@@ -9,6 +9,7 @@ class BloomdClient
 	const BLOOMD_LIST_START = "START";
 	const BLOOMD_LIST_END = "END";
 	const BLOOMD_YES = "Yes";
+	const BLOOMD_NO_EXIST = "Filter does not exist";
 
 	// INSTANCE VARIABLES - - - - - - - - - - - - - - - - -
 
@@ -181,22 +182,16 @@ class BloomdClient
 		// Parse through multi line response
 		foreach (explode("\n", $response) as $line)
 		{
-			// Check for bad response
-			if ($line == "Filter does not exist")
-			{
-				break;
-			}
-
 			// Strip newlines, ignore start and end messages
 			$line = trim($line, "\r\n");
-			if ($line === self::BLOOMD_LIST_START || $line === self::BLOOMD_LIST_END)
+			if ($line === self::BLOOMD_LIST_START || $line === self::BLOOMD_LIST_END || $line === self::BLOOMD_NO_EXIST)
 			{
 				continue;
 			}
 
 			// Split into keys and values
-			$pair = explode(" ", $line);
-			$status[$pair[0]] = $pair[1];
+			list($k, $v) = explode(" ", $line);
+			$status[$k] = $v;
 		}
 
 		return $status;
