@@ -3,6 +3,12 @@ php-bloomd
 
 PHP 5.4+ class for interacting with a bloomd server (https://github.com/armon/bloomd).  MIT Licensed.
 
+Installation
+------------
+
+php-bloomd can be installed via Composer.  Add `"mdlayher/php-bloomd": "dev-master"` to the `require` section
+of your `composer.json` and run `composer install`.
+
 Example
 -------
 
@@ -11,7 +17,7 @@ All commands accepted by bloomd are implemented in php-bloomd.  Here is a basic 
 ```php
 <?php
 // php-bloomd - Example basic usage script
-require_once __DIR__ . "/php-bloomd.php";
+require_once __DIR__ . "/vendor/autoload.php";
 
 // Establish a connection to a local bloomd with client
 $bloomd = new BloomdClient("localhost", 8673);
