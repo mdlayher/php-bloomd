@@ -93,6 +93,53 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 		}
 	}
 
+	// Verify that it is possible to list information about a filter by its name
+	public function testListFilters()
+	{
+		$bloomd = new Client("localhost");
+		$bloomd->connect();
+
+		$filter = $bloomd->listFilters(self::$filter);
+
+		// Verify all fields contained in first filter
+		$fields = array("name", "probability", "size", "capacity", "items");
+		foreach ($fields as $f)
+		{
+			$this->assertArrayHasKey($f, $filter[0]);
+		}
+	}
+
+	// Verify that it is possible to query extended information about a filter by its name
+	public function testInfo()
+	{
+		$bloomd = new Client("localhost");
+		$bloomd->connect();
+
+		$filter = $bloomd->info(self::$filter);
+
+		// Verify all fields contained in filter information
+		$fields = array(
+			"capacity",
+			"checks",
+			"check_hits",
+			"check_misses",
+			"in_memory",
+			"page_ins",
+			"page_outs",
+			"probability",
+			"sets",
+			"set_hits",
+			"set_misses",
+			"size",
+			"storage",
+		);
+
+		foreach ($fields as $f)
+		{
+			$this->assertArrayHasKey($f, $filter);
+		}
+	}
+
 	// Verify that it is possible to drop a filter on bloomd server
 	public function testDropFilter()
 	{
