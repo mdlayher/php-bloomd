@@ -9,6 +9,12 @@ Installation
 php-bloomd can be installed via Composer.  Add `"mdlayher/php-bloomd": "dev-master"` to the `require` section
 of your `composer.json` and run `composer install`.
 
+Testing
+-------
+
+php-bloomd can be tested using PHPUnit.  Simply run `phpunit test` from the project root with a local bloomd
+server running on port 8673.
+
 Example
 -------
 
