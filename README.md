@@ -20,7 +20,7 @@ All commands accepted by bloomd are implemented in php-bloomd.  Here is a basic 
 require_once __DIR__ . "/vendor/autoload.php";
 
 // Establish a connection to a local bloomd with client
-$bloomd = new BloomdClient("localhost", 8673);
+$bloomd = new PhpBloomd\BloomdClient("localhost", 8673);
 if (!$bloomd->connect())
 {
 	printf("example: failed to connect\n");
