@@ -1,5 +1,7 @@
 <?php
 
+namespace PhpBloomd;
+
 class BloomdClient
 {
 	// CONSTANTS - - - - - - - - - - - - - - - - - - - - -
