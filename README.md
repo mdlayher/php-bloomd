@@ -40,9 +40,13 @@ if (!$bloomd->createFilter("php"))
 	exit;
 }
 
-// Set a couple of values in filter
+// Create a filter object to use more concise, object-oriented interface
+$filter = $bloomd->filter("php");
+
+// Set a couple of values in filter, using both BloomdClient and direct BloomFilter
+// Either method may be used for all functions which accept a filter name as first parameter
 $bloomd->set("php", "foo");
-$bloomd->set("php", "bar");
+$filter->set("bar");
 
 // Check the filter for membership
 if ($bloomd->check("php", "foo"))
@@ -51,20 +55,20 @@ if ($bloomd->check("php", "foo"))
 }
 
 // Bulk set values
-$results = $bloomd->bulk("php", array("foo", "bar", "baz"));
+$results = $filter->bulk(array("foo", "bar", "baz"));
 foreach ($results as $k => $v)
 {
 	printf("%s -> %s\n", $k, $v ? "true" : "false");
 }
 
 // Multi check values
-$results = $bloomd->multi("php", array("foo", "bar", "baz"));
+$results = $filter->multi(array("foo", "bar", "baz"));
 foreach ($results as $k => $v)
 {
 	printf("%s -> %s\n", $k, $v ? "true" : "false");
 }
 
 // Drop filter, disconnect
-$bloomd->dropFilter("php");
+$filter->dropFilter();
 $bloomd->disconnect();
 ```
