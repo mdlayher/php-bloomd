@@ -84,6 +84,12 @@ class BloomdClient
 		return false;
 	}
 
+	// Generate a BloomFilter object from this client
+	public function filter($name)
+	{
+		return new BloomFilter($name, $this);
+	}
+
 	// Create a bloom filter on server
 	public function createFilter($name, $capacity = null, $probability = null, $inMemory = null)
 	{
