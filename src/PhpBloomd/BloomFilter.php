@@ -26,7 +26,9 @@ class BloomFilter
 	public function __call($name, $args)
 	{
 		// Disallowed methods for this object
-		$disallowed = array("connect", "disconnect");
+		// connect/disconnect - creating or destroying connection from filter
+		// filter - creating another filter from this one
+		$disallowed = array("connect", "disconnect", "filter");
 
 		if (method_exists($this->client, $name) && !in_array($name, $disallowed))
 		{
