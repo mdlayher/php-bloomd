@@ -2,7 +2,9 @@
 
 namespace PhpBloomd;
 
-class BloomdClient
+require_once __DIR__ . "/IBloomdClient.php";
+
+class BloomdClient implements IBloomdClient
 {
 	// CONSTANTS - - - - - - - - - - - - - - - - - - - - -
 

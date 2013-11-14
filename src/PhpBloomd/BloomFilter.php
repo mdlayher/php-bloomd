@@ -14,7 +14,7 @@ class BloomFilter
 
 	// CONSTRUCTOR - - - - - - - - - - - - - - - - - - - - -
 
-	public function __construct($name, BloomdClient $client)
+	public function __construct($name, IBloomdClient $client)
 	{
 		$this->name = $name;
 		$this->client = $client;
