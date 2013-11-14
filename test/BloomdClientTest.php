@@ -11,7 +11,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// Verify that it is possible to connect and disconnect to a local bloomd server
 	public function testConnect()
 	{
-		$bloomd = new Client("localhost");
+		$bloomd = new Client();
 
 		$this->assertTrue($bloomd->connect());
 		$this->assertTrue($bloomd->disconnect());
@@ -20,7 +20,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// Verify that it is possible to create a filter on bloomd server
 	public function testCreateFilter()
 	{
-		$bloomd = new Client("localhost");
+		$bloomd = new Client();
 		$bloomd->connect();
 
 		// Drop any pre-existing filters to clear state
@@ -33,7 +33,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// Verify that it is possible to set items into a filter on bloomd server, but not duplicates
 	public function testSet()
 	{
-		$bloomd = new Client("localhost");
+		$bloomd = new Client();
 		$bloomd->connect();
 
 		// Set unique items, should return true
@@ -51,7 +51,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// but NOT possible to return false on an item which does exist
 	public function testCheck()
 	{
-		$bloomd = new Client("localhost");
+		$bloomd = new Client();
 		$bloomd->connect();
 
 		// Items which exist will always return true
@@ -64,7 +64,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// Verify that it is possible to bulk set values on bloomd server
 	public function testBulk()
 	{
-		$bloomd = new Client("localhost");
+		$bloomd = new Client();
 		$bloomd->connect();
 
 		// Will return associative array of keys and their status
@@ -80,7 +80,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// Verify that it is possible to multi check values on bloomd server
 	public function testMulti()
 	{
-		$bloomd = new Client("localhost");
+		$bloomd = new Client();
 		$bloomd->connect();
 
 		// Will return associative array of keys and their status
@@ -96,7 +96,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// Verify that it is possible to check for any value in array on bloomd server
 	public function testAny()
 	{
-		$bloomd = new Client("localhost");
+		$bloomd = new Client();
 		$bloomd->connect();
 
 		$this->assertTrue($bloomd->any(self::$filter, array("foo", "bar", "meow")));
@@ -105,7 +105,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// Verify that it is possible to check for all values in array on bloomd server
 	public function testAll()
 	{
-		$bloomd = new Client("localhost");
+		$bloomd = new Client();
 		$bloomd->connect();
 
 		$this->assertTrue($bloomd->all(self::$filter, array("foo", "bar")));
@@ -114,7 +114,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// Verify that it is possible to list information about a filter by its name
 	public function testListFilters()
 	{
-		$bloomd = new Client("localhost");
+		$bloomd = new Client();
 		$bloomd->connect();
 
 		$filter = $bloomd->listFilters(self::$filter);
@@ -130,7 +130,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// Verify that it is possible to query extended information about a filter by its name
 	public function testInfo()
 	{
-		$bloomd = new Client("localhost");
+		$bloomd = new Client();
 		$bloomd->connect();
 
 		$filter = $bloomd->info(self::$filter);
@@ -161,7 +161,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// Verify that it is possible to drop a filter on bloomd server
 	public function testDropFilter()
 	{
-		$bloomd = new Client("localhost");
+		$bloomd = new Client();
 		$bloomd->connect();
 
 		$this->assertTrue($bloomd->dropFilter(self::$filter));

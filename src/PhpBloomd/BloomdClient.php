@@ -29,7 +29,7 @@ class BloomdClient implements IBloomdClient
 
 	// CONSTRUCTOR/DESTRUCTOR - - - - - - - - - - - - - - -
 
-	public function __construct($host, $port = 8673)
+	public function __construct($host = "localhost", $port = 8673)
 	{
 		$this->host = $host;
 		$this->port = $port;
