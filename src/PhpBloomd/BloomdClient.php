@@ -43,7 +43,7 @@ class BloomdClient implements IBloomdClient
 	{
 		if (isset($this->socket))
 		{
-			socket_close($this->socket);
+			fclose($this->socket);
 		}
 	}
 
@@ -126,9 +126,9 @@ class BloomdClient implements IBloomdClient
 		// Parse through multi line response
 		foreach (explode("\n", $response) as $line)
 		{
-			// Strip newlines, ignore start and end messages
+			// Strip newlines, ignore blanks
 			$line = trim($line, "\r\n");
-			if ($line === self::BLOOMD_LIST_START || $line === self::BLOOMD_LIST_END)
+			if ($line == "")
 			{
 				continue;
 			}
@@ -153,9 +153,9 @@ class BloomdClient implements IBloomdClient
 		// Parse through multi line response
 		foreach (explode("\n", $response) as $line)
 		{
-			// Strip newlines, ignore start and end messages
+			// Strip newlines, ignore blanks or non-existant filters
 			$line = trim($line, "\r\n");
-			if ($line === self::BLOOMD_LIST_START || $line === self::BLOOMD_LIST_END || $line === self::BLOOMD_NO_EXIST)
+			if ($line == "" || $line === self::BLOOMD_NO_EXIST)
 			{
 				continue;
 			}
@@ -239,11 +239,10 @@ class BloomdClient implements IBloomdClient
 		}
 
 		// If not established, create a IPv4 TCP socket
-		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-		socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, array('sec' => 1, 'usec' => 0));
+		$this->socket = @stream_socket_client(sprintf("tcp://%s:%d", $this->host, $this->port), $errno, $errmsg);
 
 		// Connect to host
-		if (!@socket_connect($this->socket, $this->host, $this->port))
+		if (!$this->socket)
 		{
 			throw new \RuntimeException(__METHOD__ . ": failed to connect to bloomd server: " . $this->host . ":" . $this->port);
 		}
@@ -257,8 +256,19 @@ class BloomdClient implements IBloomdClient
 		$socket = $this->connect();
 
 		// Write message on socket, read reply
-		@socket_write($socket, $input . "\n");
-		$response = trim(@socket_read($socket, 8192), "\r\n");
+		fwrite($socket, $input . "\r\n");
+		$response = trim(fgets($socket), "\r\n");
+
+		// If reply indicates a list, loop it
+		if ($response == self::BLOOMD_LIST_START)
+		{
+			// Loop until list end
+			$response = "";
+			while (($line = trim(fgets($socket), "\r\n")) != self::BLOOMD_LIST_END)
+			{
+				$response .= $line . "\n";
+			}
+		}
 
 		// Throw exception if no response
 		if (empty($response))
