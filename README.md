@@ -27,11 +27,6 @@ require_once __DIR__ . "/vendor/autoload.php";
 
 // Establish a connection to a local bloomd with client
 $bloomd = new PhpBloomd\BloomdClient("localhost", 8673);
-if (!$bloomd->connect())
-{
-	printf("example: failed to connect\n");
-	exit;
-}
 
 // Create a filter
 if (!$bloomd->createFilter("php"))
@@ -80,7 +75,6 @@ if ($filter->all(array("foo", "bar", "baz")))
 	printf("all: yes!\n");
 }
 
-// Drop filter, disconnect
+// Drop filter
 $filter->dropFilter();
-$bloomd->disconnect();
 ```
