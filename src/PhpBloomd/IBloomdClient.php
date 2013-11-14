@@ -4,9 +4,6 @@ namespace PhpBloomd;
 
 interface IBloomdClient
 {
-	public function connect();
-	public function disconnect();
-
 	public function filter($name);
 
 	public function createFilter($name, $capacity = null, $probability = null, $inMemory = null);

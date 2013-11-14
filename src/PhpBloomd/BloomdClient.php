@@ -24,67 +24,30 @@ class BloomdClient implements IBloomdClient
 	// The socket used for communication with bloomd
 	protected $socket;
 
-	// Connection status
-	protected $connected = false;
-
 	// CONSTRUCTOR/DESTRUCTOR - - - - - - - - - - - - - - -
 
 	public function __construct($host = "localhost", $port = 8673)
 	{
 		$this->host = $host;
+
+		// Validate port is integer, and in valid port range
+		if (!ctype_digit($port) || $port < 1 || $port > 65535)
+		{
+			throw new \InvalidArgumentException(__CLASS__ . ": port must be a valid integer between 1 and 65535");
+		}
+
 		$this->port = $port;
 	}
 
 	public function __destruct()
 	{
-		// Ensure open connections closed
-		if ($this->connected || isset($this->socket))
+		if (isset($this->socket))
 		{
-			$this->disconnect();
+			socket_close($this->socket);
 		}
-
-		return true;
 	}
 
 	// PUBLIC METHODS - - - - - - - - - - - - - - - - - - - -
-
-	// Initiate a connection to bloomd server
-	public function connect()
-	{
-		if ($this->connected)
-		{
-			return false;
-		}
-
-		// Create a IPv4 TCP socket
-		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-		socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, array('sec' => 1, 'usec' => 0));
-
-		// Connect to host
-		if (!@socket_connect($this->socket, $this->host, intval($this->port)))
-		{
-			return false;
-		}
-
-		$this->connected = true;
-		return true;
-	}
-
-	// Close a connection to bloomd server
-	public function disconnect()
-	{
-		// Verify socket is actually open
-		if ($this->connected && isset($this->socket))
-		{
-			// Close socket
-			socket_close($this->socket);
-
-			$this->connected = false;
-			return true;
-		}
-
-		return false;
-	}
 
 	// Generate a BloomFilter object from this client
 	public function filter($name)
@@ -266,22 +229,41 @@ class BloomdClient implements IBloomdClient
 
 	// PRIVATE METHODS - - - - - - - - - - - - - - - - - - - -
 
+	// Establish or re-use socket connection
+	private function connect()
+	{
+		// Return existing socket
+		if (isset($this->socket))
+		{
+			return $this->socket;
+		}
+
+		// If not established, create a IPv4 TCP socket
+		$this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+		socket_set_option($this->socket, SOL_SOCKET, SO_SNDTIMEO, array('sec' => 1, 'usec' => 0));
+
+		// Connect to host
+		if (!@socket_connect($this->socket, $this->host, $this->port))
+		{
+			throw new \RuntimeException(__METHOD__ . ": failed to connect to bloomd server: " . $this->host . ":" . $this->port);
+		}
+
+		return $this->socket;
+	}
+
 	// Send a message to server on socket
 	private function send($input)
 	{
-		if (!$this->connected || empty($this->socket))
-		{
-			throw new Exception(__METHOD__ . ": client is not connected to bloomd server!");
-		}
+		$socket = $this->connect();
 
 		// Write message on socket, read reply
-		@socket_write($this->socket, $input . "\n");
-		$response = trim(@socket_read($this->socket, 8192), "\r\n");
+		@socket_write($socket, $input . "\n");
+		$response = trim(@socket_read($socket, 8192), "\r\n");
 
 		// Throw exception if no response
 		if (empty($response))
 		{
-			throw new Exception(__METHOD__ . ": received empty response from bloomd server!");
+			throw new \RuntimeException(__METHOD__ . ": received empty response from bloomd server!");
 		}
 
 		return $response;
