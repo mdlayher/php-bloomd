@@ -93,6 +93,24 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 		}
 	}
 
+	// Verify that it is possible to check for any value in array on bloomd server
+	public function testAny()
+	{
+		$bloomd = new Client("localhost");
+		$bloomd->connect();
+
+		$this->assertTrue($bloomd->any(self::$filter, array("foo", "bar", "meow")));
+	}
+
+	// Verify that it is possible to check for all values in array on bloomd server
+	public function testAll()
+	{
+		$bloomd = new Client("localhost");
+		$bloomd->connect();
+
+		$this->assertTrue($bloomd->all(self::$filter, array("foo", "bar")));
+	}
+
 	// Verify that it is possible to list information about a filter by its name
 	public function testListFilters()
 	{

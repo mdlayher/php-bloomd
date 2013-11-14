@@ -230,6 +230,40 @@ class BloomdClient implements IBloomdClient
 		return $this->sendMulti("multi", $filter, $items);
 	}
 
+	// Check for multiple items in filter on server, but return true if any of them exist
+	public function any($filter, array $items)
+	{
+		// Check array of values
+		foreach ($this->multi($filter, $items) as $key => $value)
+		{
+			// Return true on first success
+			if ($value)
+			{
+				return true;
+			}
+		}
+
+		// Return false if none found
+		return false;
+	}
+
+	// Check for multiple items in filter on server, but return true if all of them exist
+	public function all($filter, array $items)
+	{
+		// Check array of values
+		foreach ($this->multi($filter, $items) as $key => $value)
+		{
+			// Return false on first failure
+			if (!$value)
+			{
+				return false;
+			}
+		}
+
+		// Return true if all found
+		return true;
+	}
+
 	// PRIVATE METHODS - - - - - - - - - - - - - - - - - - - -
 
 	// Send a message to server on socket

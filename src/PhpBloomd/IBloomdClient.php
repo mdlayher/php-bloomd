@@ -22,4 +22,6 @@ interface IBloomdClient
 
 	public function bulk($filter, array $items);
 	public function multi($filter, array $items);
+	public function any($filter, array $items);
+	public function all($filter, array $items);
 }

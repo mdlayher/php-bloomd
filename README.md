@@ -68,6 +68,18 @@ foreach ($results as $k => $v)
 	printf("%s -> %s\n", $k, $v ? "true" : "false");
 }
 
+// Check for any value in array
+if ($filter->any(array("foo", "qux")))
+{
+	printf("any: yes!\n");
+}
+
+// Check for all values in array
+if ($filter->all(array("foo", "bar", "baz")))
+{
+	printf("all: yes!\n");
+}
+
 // Drop filter, disconnect
 $filter->dropFilter();
 $bloomd->disconnect();
