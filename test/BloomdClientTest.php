@@ -8,33 +8,20 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	// Name of filter
 	private static $filter = "phpunit";
 
-	// Verify that it is possible to connect and disconnect to a local bloomd server
-	public function testConnect()
-	{
-		$bloomd = new Client();
-
-		$this->assertTrue($bloomd->connect());
-		$this->assertTrue($bloomd->disconnect());
-	}
-
 	// Verify that it is possible to create a filter on bloomd server
 	public function testCreateFilter()
 	{
 		$bloomd = new Client();
-		$bloomd->connect();
 
 		// Drop any pre-existing filters to clear state
 		$bloomd->dropFilter(self::$filter);
 		$this->assertTrue($bloomd->createFilter(self::$filter));
-
-		$bloomd->disconnect();
 	}
 
 	// Verify that it is possible to set items into a filter on bloomd server, but not duplicates
 	public function testSet()
 	{
 		$bloomd = new Client();
-		$bloomd->connect();
 
 		// Set unique items, should return true
 		$this->assertTrue($bloomd->set(self::$filter, "foo"));
@@ -42,8 +29,6 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 
 		// Should return false due to duplicate item
 		$this->assertFalse($bloomd->set(self::$filter, "foo"));
-
-		$bloomd->disconnect();
 	}
 
 	// Verify that it is possible to check for items from a filter on bloomd server
@@ -52,20 +37,16 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	public function testCheck()
 	{
 		$bloomd = new Client();
-		$bloomd->connect();
 
 		// Items which exist will always return true
 		$this->assertTrue($bloomd->check(self::$filter, "foo"));
 		$this->assertTrue($bloomd->check(self::$filter, "bar"));
-
-		$bloomd->disconnect();
 	}
 
 	// Verify that it is possible to bulk set values on bloomd server
 	public function testBulk()
 	{
 		$bloomd = new Client();
-		$bloomd->connect();
 
 		// Will return associative array of keys and their status
 		// ex: array("foo" => true, "bar" => false), etc
@@ -81,7 +62,6 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	public function testMulti()
 	{
 		$bloomd = new Client();
-		$bloomd->connect();
 
 		// Will return associative array of keys and their status
 		// ex: array("foo" => true, "bar" => false), etc
@@ -97,7 +77,6 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	public function testAny()
 	{
 		$bloomd = new Client();
-		$bloomd->connect();
 
 		$this->assertTrue($bloomd->any(self::$filter, array("foo", "bar", "meow")));
 	}
@@ -106,7 +85,6 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	public function testAll()
 	{
 		$bloomd = new Client();
-		$bloomd->connect();
 
 		$this->assertTrue($bloomd->all(self::$filter, array("foo", "bar")));
 	}
@@ -115,7 +93,6 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	public function testListFilters()
 	{
 		$bloomd = new Client();
-		$bloomd->connect();
 
 		$filter = $bloomd->listFilters(self::$filter);
 
@@ -131,7 +108,6 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	public function testInfo()
 	{
 		$bloomd = new Client();
-		$bloomd->connect();
 
 		$filter = $bloomd->info(self::$filter);
 
@@ -162,10 +138,7 @@ class BloomdClientTest extends PHPUnit_Framework_TestCase
 	public function testDropFilter()
 	{
 		$bloomd = new Client();
-		$bloomd->connect();
 
 		$this->assertTrue($bloomd->dropFilter(self::$filter));
-
-		$bloomd->disconnect();
 	}
 }
