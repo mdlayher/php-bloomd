@@ -41,7 +41,7 @@ class BloomdClient implements IBloomdClient
 
 	public function __destruct()
 	{
-		if (isset($this->socket))
+		if (isset($this->socket) && is_resource($this->socket))
 		{
 			fclose($this->socket);
 		}
